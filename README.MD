@@ -25,6 +25,8 @@ TotalHotelRevPAR = Total Revenue (Rooms + F&B + Other) \ Rooms Available
 
 A full commercial view beyond rooms revenue.
 
+
+
 ---
 
 ### **3. ADR (Average Daily Rate)**  
@@ -124,3 +126,46 @@ Offline channels include:
 - Travel agents (non-digital)
 
 ---
+Project Structure
+
+│
+HOTEL-DEMAND-FORECASTING V3/
+│
+├── __pycache__/
+│
+├── artifacts/
+│   └── (ML model outputs, processed files)
+│
+├── logs/
+│   └── (application logs)
+│
+├── myenv/
+│   └── (virtual environment)
+│
+├── Notebook/
+│   ├── logs/
+│   ├── cleaned_hotel_data.csv
+│   ├── data.csv
+│   ├── EDA.ipynb
+│
+├── src/
+│   ├── __pycache__/
+│   │
+│   ├── components/
+│   │   ├── __init__.py
+│   │   ├── data_ingestion.py
+│   │   ├── kpi_engine.py
+│   │
+│   ├── Pipeline/
+│       ├── __init__.py
+│       ├── exception.py
+│       ├── logger.py
+│
+├── .env
+├── .gitignore
+├── kpi_summary.json
+├── kpi_summary.txt
+├── main.py
+├── README.md
+├── requirements.txt
+
