@@ -126,9 +126,10 @@ Offline channels include:
 - Travel agents (non-digital)
 
 ---
-Project Structure
 
-│
+#  **Project Structure**
+
+```
 HOTEL-DEMAND-FORECASTING V3/
 │
 ├── __pycache__/
@@ -168,4 +169,5 @@ HOTEL-DEMAND-FORECASTING V3/
 ├── main.py
 ├── README.md
 ├── requirements.txt
+```
 
