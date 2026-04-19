@@ -154,6 +154,20 @@ class HotelKPIEngine:
             logger.error(CustomException(e))
             raise CustomException(e)
 
+    def cancellation(self, df_year):
+
+        try:
+            total = len(df_year)
+            canceled = df_year[df_year["is_canceled"] == 1].shape[0]
+            logger.info(
+                f"cancellation calculated successfully for hotel: {self.hotel_name}"
+            )
+            return (canceled / total) * 100
+
+        except Exception as e:
+            logger.error(CustomException(e))
+            raise CustomException(e)
+
     def summary(self, year):
 
         try:
@@ -164,19 +178,21 @@ class HotelKPIEngine:
             Segments = self.segmentation(df_year)
             Distribution = self.distribution_channel(df_year)
             Customer = self.customer_type(df_year)
+            Cancellation = self.cancellation(df_year)
 
             return {
                 "Hotel code": self.hotel_name,
                 "Year": year,
                 "room_available": room_available,
                 "rooms_sold": rooms_sold,
-                "room_revenue": room_revenue,
-                "Occupancy": self.occupancy(rooms_sold, room_available),
-                "RevPAR": self.RevPAR(room_revenue, room_available),
-                "ADR": self.ADR(room_revenue, rooms_sold),
+                "room_revenue": f"{room_revenue:,.2f} $",
+                "Occupancy": f"{self.occupancy(rooms_sold, room_available):.2f}%",
+                "RevPAR": f"{self.RevPAR(room_revenue, room_available):.2f} $",
+                "ADR": f"{self.ADR(room_revenue, rooms_sold):.2f} $",
                 "Segmentation": Segments,
                 "Distribution": Distribution,
                 "Customer": Customer,
+                "Cancellation": Cancellation,
             }
 
         except Exception as e:
