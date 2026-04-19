@@ -12,7 +12,6 @@ The goal is to calculate the most important **commercial hotel KPIs** used in Re
 ##  **KPIs Included**
 
 ### **1. RevPAR (Revenue per Available Room)**  
-
 RevPAR = Occupancy Rate * ADR
 
 
