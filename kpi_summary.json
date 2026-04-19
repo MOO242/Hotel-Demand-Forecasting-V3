@@ -1,0 +1,14 @@
+{
+    "Hotel code": "Hotel list",
+    "Year": 2016,
+    "room_available": 183000,
+    "rooms_sold": "116647",
+    "room_revenue": "11,469,335.50 $",
+    "Occupancy": "63.74%",
+    "RevPAR": "62.67 $",
+    "ADR": "98.33 $",
+    "Segmentation": "market_segment\nAviation           40155.00\nCorporate         277996.04\nDirect           1592382.05\nGroups            665428.67\nOffline TA/TO    2641462.15\nOnline TA        6251911.59\nName: room_revenue, dtype: float64",
+    "Distribution": "distribution_channel\nCorporate     437081.29\nDirect       1734648.65\nGDS            19077.27\nTA/TO        9278528.29\nName: room_revenue, dtype: float64",
+    "Customer": "customer_type\nContract            391466.97\nGroup                24094.29\nTransient          8774108.25\nTransient-Party    2279665.99\nName: room_revenue, dtype: float64",
+    "Cancellation": 32.57762065785429
+}

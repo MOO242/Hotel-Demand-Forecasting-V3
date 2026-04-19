@@ -29,7 +29,7 @@ A full commercial view beyond rooms revenue.
 
 ### **3. ADR (Average Daily Rate)**  
 
-ADR} = Room Revenue\ Rooms Sold
+ADR = Room Revenue\ Rooms Sold
 
 
 Shows the average price paid per sold room.
@@ -38,7 +38,7 @@ Shows the average price paid per sold room.
 
 ### **4. Occupancy Rate**  
 
-Occupancy} = Rooms Sold \ Rooms Available
+Occupancy = Rooms Sold \ Rooms Available
 
 
 Indicates how full the hotel is.
