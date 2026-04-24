@@ -9,7 +9,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Folder name = today's date (YYYY_MM_DD)
 TODAY = datetime.now().strftime("%Y_%m_%d")
-DAILY_LOG_DIR = os.path.join(ROOT_DIR, "logs", TODAY)
+DAILY_LOG_DIR = os.path.join(ROOT_DIR, "log", TODAY)
 
 os.makedirs(DAILY_LOG_DIR, exist_ok=True)
 
@@ -40,4 +40,5 @@ logging.basicConfig(
 # ---------------------------------------------------------
 # 5. Export logger
 # ---------------------------------------------------------
+
 logger = logging.getLogger("hotel_pricing")

@@ -39,9 +39,12 @@ class HotelKPIEngine:
             self.df["stays_in_week_nights"] + self.df["stays_in_weekend_nights"]
         )
 
-        # Ensure datetime format
-        self.df["reservation_status_date"] = pd.to_datetime(
-            self.df["reservation_status_date"]
+        self.df["stay_date"] = pd.to_datetime(
+            self.df["arrival_date_year"].astype(str)
+            + "-"
+            + self.df["arrival_date_month"]
+            + "-"
+            + self.df["arrival_date_day_of_month"].astype(str)
         )
 
         logger.info(f"Initializing KPI Engine for: {hotel_name}")
@@ -50,61 +53,26 @@ class HotelKPIEngine:
         """
         Filter the dataset for a specific calendar year.
 
-        Parameters
-        ----------
-        year : int
-            The year to filter (e.g., 2016).
-
-        Returns
-        -------
-        pandas.DataFrame
-            Filtered dataframe containing only records from the given year.
         """
-        start = pd.to_datetime(f"{year}-01-01")
-        end = pd.to_datetime(f"{year}-12-31")
-
         logger.info(f"Filtering data for year: {year}")
 
-        return self.df[
-            (self.df["reservation_status_date"] >= start)
-            & (self.df["reservation_status_date"] <= end)
-        ]
+        return self.df[self.df["arrival_date_year"] == year]
 
-    def Rooms_Available(self, df_year):
+    def rooms_available(self, df_year):
         """
         Calculate total rooms available for the selected year.
-
-        Formula:
-            Rooms Available = Number of unique dates × hotel capacity
-
-        Parameters
-        ----------
-        df_year : pandas.DataFrame
-            Year-filtered dataset.
-
-        Returns
-        -------
-        int
-            Total rooms available for the year.
         """
         try:
-            return df_year["reservation_status_date"].nunique() * self.capacity
+            total_days = df_year["stay_date"].nunique()
+            return total_days * self.capacity
         except Exception as e:
             logger.error(CustomException(e))
             raise CustomException(e)
 
-    def Rooms_sold(self, df_year):
+    def rooms_sold(self, df_year):
         """
         Calculate total room nights sold (excluding cancellations).
 
-        Parameters
-        ----------
-        df_year : pandas.DataFrame
-
-        Returns
-        -------
-        int
-            Total room nights sold.
         """
         try:
             active_df = df_year[df_year["is_canceled"] == 0]
@@ -113,21 +81,10 @@ class HotelKPIEngine:
             logger.error(CustomException(e))
             raise CustomException(e)
 
-    def Room_revenue(self, df_year):
+    def room_revenue(self, df_year):
         """
         Calculate total room revenue for the year.
 
-        Formula:
-            Room Revenue = ADR × Room Nights Sold
-
-        Parameters
-        ----------
-        df_year : pandas.DataFrame
-
-        Returns
-        -------
-        float
-            Total room revenue.
         """
         try:
             active_df = df_year[df_year["is_canceled"] == 0].copy()
@@ -140,14 +97,6 @@ class HotelKPIEngine:
     def occupancy(self, rooms_sold, rooms_available):
         """
         Calculate occupancy percentage.
-
-        Formula:
-            Occupancy % = (Rooms Sold / Rooms Available) × 100
-
-        Returns
-        -------
-        float
-            Occupancy percentage.
         """
         try:
             return (rooms_sold / rooms_available) * 100
@@ -158,17 +107,10 @@ class HotelKPIEngine:
     def RevPAR(self, room_revenue, room_available):
         """
         Calculate Revenue Per Available Room (RevPAR).
-
-        Formula:
-            RevPAR = Room Revenue / Rooms Available
-
-        Returns
-        -------
-        float
-            RevPAR value.
         """
         try:
-            return room_revenue / room_available
+            RevPAR = room_revenue / room_available
+            return RevPAR
         except Exception as e:
             logger.error(CustomException(e))
             raise CustomException(e)
@@ -176,17 +118,10 @@ class HotelKPIEngine:
     def ADR(self, room_revenue, room_sold):
         """
         Calculate Average Daily Rate (ADR).
-
-        Formula:
-            ADR = Room Revenue / Rooms Sold
-
-        Returns
-        -------
-        float
-            ADR value.
         """
         try:
-            return room_revenue / room_sold
+            ADR = room_revenue / room_sold
+            return ADR
         except Exception as e:
             logger.error(CustomException(e))
             raise CustomException(e)
@@ -195,10 +130,6 @@ class HotelKPIEngine:
         """
         Calculate revenue contribution by market segment.
 
-        Returns
-        -------
-        pandas.Series
-            Revenue grouped by market segment.
         """
         try:
             active_df = df_year[df_year["is_canceled"] == 0].copy()
@@ -212,10 +143,6 @@ class HotelKPIEngine:
         """
         Calculate revenue contribution by distribution channel.
 
-        Returns
-        -------
-        pandas.Series
-            Revenue grouped by distribution channel.
         """
         try:
             active_df = df_year[df_year["is_canceled"] == 0].copy()
@@ -229,10 +156,6 @@ class HotelKPIEngine:
         """
         Calculate revenue contribution by customer type.
 
-        Returns
-        -------
-        pandas.Series
-            Revenue grouped by customer type.
         """
         try:
             active_df = df_year[df_year["is_canceled"] == 0].copy()
@@ -245,14 +168,6 @@ class HotelKPIEngine:
     def cancellation(self, df_year):
         """
         Calculate cancellation percentage.
-
-        Formula:
-            Cancellation % = (Canceled Bookings / Total Bookings) × 100
-
-        Returns
-        -------
-        float
-            Cancellation percentage.
         """
         try:
             total = len(df_year)
@@ -265,33 +180,68 @@ class HotelKPIEngine:
     def summary(self, year):
         """
         Generate a full KPI summary for the selected year.
-
-        Returns
-        -------
-        dict
-            Dictionary containing all KPIs and breakdowns.
+        Returns a clean Pandas DataFrame ready for analysis.
         """
         try:
             df_year = self.filter_year(year)
-            room_available = self.Rooms_Available(df_year)
-            rooms_sold = self.Rooms_sold(df_year)
-            room_revenue = self.Room_revenue(df_year)
+            room_available = self.rooms_available(df_year)
+            rooms_sold = self.rooms_sold(df_year)
+            room_revenue = self.room_revenue(df_year)
 
-            return {
-                "Hotel code": self.hotel_name,
-                "Year": year,
-                "room_available": room_available,
+            summary_dict = {
+                "hotel_code": self.hotel_name,
+                "year": year,
+                "rooms_available": room_available,
                 "rooms_sold": rooms_sold,
-                "room_revenue": f"{room_revenue:,.2f} $",
-                "Occupancy": f"{self.occupancy(rooms_sold, room_available):.2f}%",
-                "RevPAR": f"{self.RevPAR(room_revenue, room_available):.2f} $",
-                "ADR": f"{self.ADR(room_revenue, rooms_sold):.2f} $",
-                "Segmentation": self.segmentation(df_year),
-                "Distribution": self.distribution_channel(df_year),
-                "Customer": self.customer_type(df_year),
-                "Cancellation": self.cancellation(df_year),
+                "room_revenue": room_revenue,
+                "occupancy": self.occupancy(rooms_sold, room_available),
+                "revpar": self.RevPAR(room_revenue, room_available),
+                "adr": self.ADR(room_revenue, rooms_sold),
+                "cancellation_rate": self.cancellation(df_year),
             }
+
+            return pd.DataFrame([summary_dict])
 
         except Exception as e:
             logger.error(CustomException(e))
             raise CustomException(e)
+
+    def daily_kpi(self, year):
+        df_year = self.filter_year(year).copy()
+
+        # 1. Calculate room nights (rooms sold per reservation)
+        df_year["room_nights"] = (
+            df_year["stays_in_week_nights"] + df_year["stays_in_weekend_nights"]
+        )
+
+        # 2. Remove canceled bookings (they do NOT generate revenue)
+        df_year = df_year[df_year["is_canceled"] == 0]
+
+        # 3. Daily rooms sold = sum of room nights per day
+        daily = (
+            df_year.groupby("reservation_status_date")
+            .agg(rooms_sold=("room_nights", "sum"), adr=("adr", "mean"))  # ADR per day
+            .reset_index()
+        )
+
+        # 4. Daily rooms available = hotel capacity
+        daily["rooms_available"] = self.capacity
+
+        # 5. Daily room revenue
+        daily["room_revenue"] = daily["rooms_sold"] * daily["adr"]
+
+        # 6. Daily KPIs
+        daily["revpar"] = daily["room_revenue"] / daily["rooms_available"]
+        daily["occupancy"] = daily["rooms_sold"] / daily["rooms_available"]
+
+        return daily[
+            [
+                "reservation_status_date",
+                "rooms_available",
+                "rooms_sold",
+                "room_revenue",
+                "revpar",
+                "adr",
+                "occupancy",
+            ]
+        ]

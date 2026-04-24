@@ -64,12 +64,6 @@ except Exception as e:
 def KpiBy_hotel(data: pd.DataFrame, hotel_name: str, capacity: int, year: int) -> dict:
     """
     Calculate KPI summary for a specific hotel and year.
-
-    Returns
-    -------
-    dict
-        A dictionary containing KPI metrics such as ADR, RevPAR,
-        Occupancy, Revenue, segmentation breakdown, and distribution channels.
     """
 
     KPI = HotelKPIEngine(data, hotel_name, capacity)
@@ -80,16 +74,6 @@ def Kpi_to_file_json(filename: str, summary: dict) -> None:
     """
     Save KPI summary dictionary to a JSON file.
 
-    Parameters
-    ----------
-    filename : str
-        Full path to the output JSON file.
-    summary : dict
-        KPI summary dictionary returned by KpiBy_hotel().
-
-    Returns
-    -------
-    None
     """
     with open(filename, "w") as f:
         json.dump(summary, f, indent=4, default=str)
@@ -99,7 +83,7 @@ def Kpi_to_file_json(filename: str, summary: dict) -> None:
 # Generate KPI summary and save as JSON
 # -------------------------------------------------------------------
 
-summary_year = KpiBy_hotel(df, "Hotel list", 500, 2016)
+summary_year = KpiBy_hotel(df, "City_hotel", 300, 2016)
 
 Kpi_to_file_json(
     r"D:/Hotel-Demand-Forecasting v3/artifacts/kpi_summary.json", summary_year

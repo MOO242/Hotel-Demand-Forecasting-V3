@@ -27,6 +27,7 @@ user = os.getenv("POSTGRES_USER")
 password = os.getenv("POSTGRES_PASSWORD")
 host = os.getenv("POSTGRES_HOST")
 db = os.getenv("POSTGRES_DB")
+# port = os.getenv("POSTGRES_PORT")
 
 engine = create_engine(f"postgresql://{user}:{password}@{host}/{db}")
 
@@ -34,21 +35,6 @@ engine = create_engine(f"postgresql://{user}:{password}@{host}/{db}")
 class UploadToPostgres:
     """
     Upload a CSV file into a PostgreSQL table with logging and verification.
-
-    This class:
-    - Reads a CSV file into a pandas DataFrame
-    - Uploads the DataFrame into a specified PostgreSQL table
-    - Verifies the upload by checking row counts
-    - Logs each step for traceability
-
-    Parameters
-    ----------
-    csv_path : str
-        Full path to the CSV file to upload.
-    table_name : str
-        Name of the PostgreSQL table to write into.
-    engine : sqlalchemy.Engine
-        SQLAlchemy engine connected to the target database.
     """
 
     def __init__(self, csv_path: str, table_name: str, engine) -> None:
@@ -60,15 +46,6 @@ class UploadToPostgres:
         """
         Execute the CSV upload process.
 
-        Steps:
-        1. Load CSV into DataFrame
-        2. Upload DataFrame to PostgreSQL
-        3. Verify upload by counting rows
-
-        Raises
-        ------
-        CustomException
-            If any step in the upload process fails.
         """
         logger.info(f"Loading CSV from: {self.csv_path}")
 
@@ -76,7 +53,7 @@ class UploadToPostgres:
         logger.info(f"--- Step 2: Uploading {len(df)} rows to '{self.table_name}' ---")
 
         try:
-            df.to_sql(self.table_name, self.engine, if_exists="replace", index=False)
+            df.to_sql(self.table_name, self.engine, if_exists="append", index=False)
             logger.info("Upload successful!")
 
             self.verify_upload()
@@ -90,12 +67,6 @@ class UploadToPostgres:
         """
         Verify that the upload was successful by checking row count.
 
-        Logs the number of rows found in the target table.
-
-        Raises
-        ------
-        CustomException
-            If verification fails.
         """
         try:
             with self.engine.connect() as conn:
@@ -114,15 +85,6 @@ class DataLoader:
     """
     Load a PostgreSQL table into a pandas DataFrame.
 
-    This class is used throughout the RMS pipeline to retrieve
-    cleaned or processed data directly from the database.
-
-    Parameters
-    ----------
-    table_name : str
-        Name of the SQL table to load.
-    engine : sqlalchemy.Engine
-        SQLAlchemy engine connected to the database.
     """
 
     def __init__(self, table_name: str, engine) -> None:
@@ -135,15 +97,6 @@ class DataLoader:
         """
         Load the SQL table into a pandas DataFrame.
 
-        Returns
-        -------
-        pandas.DataFrame
-            The loaded dataset.
-
-        Raises
-        ------
-        CustomException
-            If the SQL query or loading process fails.
         """
         try:
             logger.info(f"Loading data from table: {self.table_name}")
