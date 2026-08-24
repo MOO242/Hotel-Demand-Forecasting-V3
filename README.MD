@@ -1,4 +1,4 @@
-# **Hotel-Demand-Forecasting-V3**
+# **Hotel-Demand-Forecasting-V2**
 
 Python → SQL & Python → Power BI
 
